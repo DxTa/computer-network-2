@@ -2,7 +2,6 @@ from subprocess import Popen, PIPE
 from time import sleep, time
 from argparse import ArgumentParser
 
-
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.node import CPULimitedHost
@@ -14,6 +13,7 @@ from mininet.node import OVSController
 import sys
 import os
 import signal
+import time
 
 parser = ArgumentParser(description="CWND/Queue Monitor")
 parser.add_argument('--bandwidth', '-bw',
@@ -67,14 +67,13 @@ def perf_test(bw,delay,loss):
     net.pingAll()
     print "Testing bandwidth between h1 and h4"
     h1, h2 = net.get('h1', 'h2')
-    net.iperf((h1, h2))
+    net.iperf((h1, h2), seconds=10)
     net.stop()
 
 def start_tcpprobe(exp):
     global tcpprobe
-    "Install tcp_pobe module and dump to file"
-    print "Enable tcpprobe ..."
-    e = Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
+    #  Popen("rmmod tcp_probe; modprobe tcp_probe full=1", shell=True)
+    #  e = Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
     print "Monitoring TCP CWND ... will save it to ./outputs/%s_tcpprobe.txt " % exp
     tcpprobe = Popen("cat /proc/net/tcpprobe > ./outputs/%s_tcpprobe.txt" % exp, shell=True, preexec_fn=os.setsid)
 
@@ -97,4 +96,10 @@ def run_iperf(bw, delay, algorithm, loss=0):
 
 if __name__ == '__main__':
     print args
+    "Install tcp_pobe module and dump to file"
+    print "Enable tcpprobe ..."
+    Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
+    time.sleep(2)
+    Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
+    Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
     run_iperf(args.bandwidth, args.delay, args.algorithm, args.loss)
