@@ -98,8 +98,8 @@ if __name__ == '__main__':
     print args
     "Install tcp_pobe module and dump to file"
     print "Enable tcpprobe ..."
-    Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
-    time.sleep(2)
+    #  Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
+    #  time.sleep(2)
     Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
     Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
     run_iperf(args.bandwidth, args.delay, args.algorithm, args.loss)
