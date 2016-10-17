@@ -68,6 +68,7 @@ def perf_test(bw,delay,loss):
     print "Testing bandwidth between h1 and h4"
     h1, h2 = net.get('h1', 'h2')
     #  http://mininet.org/api/classmininet_1_1net_1_1Mininet.html#a803a1ef9b199402f62e77bd0cce085d4
+    #  https://iperf.fr/iperf-doc.php, see -t --time parameter
     net.iperf((h1, h2), seconds=120)
     net.stop()
 
