@@ -57,7 +57,7 @@ class SingleSwitchTopo(Topo):
 
 def perf_test(bw,delay,loss):
     "Create network and run simple performance test"
-    topo = SingleSwitchTopo(n=2,bw=int(bw),delay='%sms' % delay,loss=int(loss))
+    topo = SingleSwitchTopo(n=2,bw=float(bw),delay='%sms' % delay,loss=int(loss))
     net = Mininet(topo=topo,
                     host=CPULimitedHost, link=TCLink, controller=OVSController)
     net.start()
@@ -67,7 +67,8 @@ def perf_test(bw,delay,loss):
     net.pingAll()
     print "Testing bandwidth between h1 and h4"
     h1, h2 = net.get('h1', 'h2')
-    net.iperf((h1, h2), seconds=10)
+    #  http://mininet.org/api/classmininet_1_1net_1_1Mininet.html#a803a1ef9b199402f62e77bd0cce085d4
+    net.iperf((h1, h2), seconds=120)
     net.stop()
 
 def start_tcpprobe(exp):
@@ -87,19 +88,13 @@ def run_iperf(bw, delay, algorithm, loss=0):
     start_tcpprobe("%s_%sMbit_%sms_%s" % (algorithm, bw, delay, loss))
     print "Running iperf ..."
     perf_test(bw,delay,loss)
-    #  iperfServer = Popen("h1 iperf -s", shell=True, preexec_fn=os.setsid)
-    #  iperfClient = Popen("h2 iperf -c h1 -i 1 -Z %s -t 120" % algorithm, shell=True, preexec_fn=os.setsid)
-    #  iperfClient.communicate()
     print "iperf running is completed"
     os.kill(os.getpgid(tcpprobe.pid), signal.SIGTERM)
     print "Clear environment!"
 
 if __name__ == '__main__':
     print args
-    "Install tcp_pobe module and dump to file"
-    print "Enable tcpprobe ..."
-    #  Popen("rmmod tcp_probe >/dev/null 2>&1 && modprobe tcp_probe full=1", shell=True)
-    #  time.sleep(2)
+    #  do the trick to change congestion algorithm, need to run twice
     Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
     Popen("sysctl -w net.ipv4.tcp_congestion_control=%s" % args.algorithm, shell=True)
     run_iperf(args.bandwidth, args.delay, args.algorithm, args.loss)
