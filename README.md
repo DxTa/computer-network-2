@@ -12,3 +12,6 @@ Assignments of Computer Network II
 ## Run the experiment
 ./run.sh
 
+## Analyze the experiment results
+./analyze.sh
+
