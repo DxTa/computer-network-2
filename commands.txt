@@ -26,3 +26,9 @@ quit
 ---------------------------
 sudo kill <pid>
 
+——————————————
+Define the experiments
+Algorithms: CUBIC, Reno, Vegas
+Network environments (bw in Mbit, delay in ms, loss in percentage): [0.05, 2ms, null], [2, 2ms, null], [2, 500ms, 50]
+
+
