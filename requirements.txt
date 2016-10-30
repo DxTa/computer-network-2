@@ -1,1 +1,3 @@
 mininet
+matplotlib
+termcolor
